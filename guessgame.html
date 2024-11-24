@@ -16,18 +16,18 @@
 <body>
 
 <main class="container">
-  <h1>数当てゲーム (1~20)</h1>
+  <h1>数当てゲーム (1~100)</h1>
   
   <div id="guessGame">
     <label for="guessField">予想: </label>
-    <input type="number" min="1" max="20" id="guessField">
+    <input type="number" min="1" max="100" id="guessField">
     <input type="submit" value="予想を入力" id="guessSubmit">
     <p id="guessResult"></p>
   </div>
 </main>
 
 <script>
-  // 1から20までのランダムな整数を生成し、コンソールにログを出力
+  // 1から100までのランダムな整数を生成し、コンソールにログを出力
   let answerNumber = Math.floor(Math.random() * 20) + 1;
   console.log('正解は' + answerNumber);
 
@@ -40,6 +40,10 @@
   // 結果を表示する要素を取得
   let guessResult = document.querySelector('#guessResult');
 
+  // 入力した回数をカウントして取得
+  let guessCount = 1;
+  // console.log(guessCount)
+
   // ユーザーの入力をチェックし、結果を表示
   function checkGuess() {
     // ユーザの入力した値を取得
@@ -47,15 +51,51 @@
 
     if (userGuess === answerNumber) { // ユーザの入力が正解
       guessResult.textContent = '正解です！';
+    } else if (guessCount === 3) {
+      guessResult.textContent = "!!!GAME OVER!!!";
+      setGameOver();
     } else if (userGuess < answerNumber) { // ユーザの入力が正解より小さい
       guessResult.textContent = 'もっと大きいです';
     } else if (userGuess > answerNumber) { // ユーザの入力が正解より大きい
       guessResult.textContent = 'もっと小さいです';
     }
+
+    guessCount++;
+    console.log(guessCount)
+
   }
 
   // submitがクリックされたときに、checkGuess関数を呼び出す
   guessSubmit.addEventListener('click', checkGuess);
+
+  function setGameOver() {
+      guessField.disabled = true;
+      guessSubmit.disabled = true;
+      resetButton = document.createElement("button");
+      resetButton.textContent = "Start new game";
+      document.body.append(resetButton);
+      resetButton.addEventListener("click", resetGame);
+}
+
+  function resetGame() {
+      guessCount = 1;
+
+  const resetParas = document.querySelectorAll(".resultParas p");
+  for (const resetPara of resetParas) {
+    resetPara.textContent = "";
+  }
+
+    resetButton.parentNode.removeChild(resetButton);
+
+    guessField.disabled = false;
+    guessSubmit.disabled = false;
+    guessField.value = "";
+    guessField.focus();
+
+    guessResult.style.backgroundColor = "white";
+
+    randomNumber = Math.floor(Math.random() * 100) + 1;
+}
 </script>
 
 </body>
