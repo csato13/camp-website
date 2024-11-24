@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>キリ番カウンター</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .counter {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    .message {
+      color: green;
+      font-size: 1.2em;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>キリ番カウンター</h1>
+  <div class="counter">現在のカウント: <span id="count">0</span></div>
+  <button id="increment">カウントを増やす</button>
+  <div id="message" class="message"></div>
+
+  <script>
+    // Firebaseの設定（Firebase Consoleからコピーしてください）
+    const firebaseConfig = {
+        apiKey: "AIzaSyBQM7j63WaYEMRvCglUAFVzifWXwvm-m9Q",
+        authDomain: "kiribanpj.firebaseapp.com",
+        databaseURL: "https://kiribanpj-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "kiribanpj",
+        storageBucket: "kiribanpj.firebasestorage.app",
+        messagingSenderId: "610241996631",
+        appId: "1:610241996631:web:0cc7c1852a68a77cc48012"
+    };
+
+    // Firebaseの初期化
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // データベース参照
+    const countRef = database.ref('counter');
+    const countElement = document.getElementById('count');
+    const messageElement = document.getElementById('message');
+    const incrementButton = document.getElementById('increment');
+
+    // カウントを取得して表示
+    countRef.on('value', (snapshot) => {
+      const count = snapshot.val() || 0; // 初期値を0に設定
+      countElement.textContent = count;
+    });
+
+    // カウントを増やす
+    incrementButton.addEventListener('click', () => {
+      countRef.transaction((currentCount) => {
+        return (currentCount || 0) + 1; // 現在のカウントを1増やす
+      }).then((result) => {
+        const newCount = result.snapshot.val();
+        if (newCount % 100 === 0 || /^(.)\1+$/.test(newCount.toString())) {
+          messageElement.textContent = `${newCount} はキリ番です！🎉`;
+        } else {
+          messageElement.textContent = '';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
