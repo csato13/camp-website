@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -23,11 +23,11 @@
       font-size: 1em;
     }
     .marquee {
-  padding: 1em 0;
-  overflow: hidden;
-  border: 1px #ccc solid;
-  border-radius: 5px;
-  background-color: #eee;
+    padding: 1em 0;
+    overflow: hidden;
+    border: 1px #ccc solid;
+    border-radius: 5px;
+    background-color: #eee;
     }   
 
   .marquee-text {
@@ -103,6 +103,130 @@
           messageElement.textContent = '';
         }
     //   });
+    });
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>キリ番カウンター</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f8f9fa;
+    }
+
+    .counter {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+
+    .message {
+      color: green;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .marquee {
+      padding: 1em 0;
+      overflow: hidden;
+      border: 1px #ccc solid;
+      border-radius: 5px;
+      background-color: #eee;
+    }
+
+    .marquee-text {
+      display: inline-block;
+      padding-left: 100%;
+      white-space: nowrap;
+      animation: marquee 10s linear infinite, color-change 5s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translate(0); }
+      100% { transform: translate(-100%); }
+    }
+
+    @keyframes color-change {
+      0% { color: red; }
+      25% { color: orange; }
+      50% { color: green; }
+      75% { color: blue; }
+      100% { color: purple; }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="marquee-text">キリ番カウンター</h1>
+  <div class="counter">現在のカウント: <span id="count"></span></div>
+  <button id="increment">カウントを増やす</button>
+  <div id="message" class="message"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    // Firebaseの設定（Firebase Consoleからコピーしてください）
+    const firebaseConfig = {
+        apiKey: "AIzaSyBQM7j63WaYEMRvCglUAFVzifWXwvm-m9Q",
+        authDomain: "kiribanpj.firebaseapp.com",
+        databaseURL: "https://kiribanpj-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "kiribanpj",
+        storageBucket: "kiribanpj.firebasestorage.app",
+        messagingSenderId: "610241996631",
+        appId: "1:610241996631:web:0cc7c1852a68a77cc48012"
+    };
+
+    // Firebaseの初期化
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // データベース参照
+    const countRef = ref(database, 'counter');
+    const countElement = document.getElementById('count');
+    const messageElement = document.getElementById('message');
+    const incrementButton = document.getElementById('increment');
+    let count = undefined;
+
+    // カウントを取得して表示
+    onValue(countRef, (snapshot) => {
+      count = snapshot.val() || 0; // 初期値を0に設定
+      countElement.textContent = count;
+    });
+
+    // カウントを増やす
+    incrementButton.addEventListener('click', () => {
+      ++count;
+      set(ref(database, 'counter'), count);
+
+      // キリ番の判定
+      if (count % 100 === 0 || /^(.)\1+$/.test(count.toString())) {
+        messageElement.textContent = `${count} はキリ番です！🎉`;
+      } else {
+        messageElement.textContent = '';
+      }
     });
   </script>
 </body>
