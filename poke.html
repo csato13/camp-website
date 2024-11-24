@@ -20,6 +20,7 @@
   
   <div id="pokemon">
     <h2 id="pokemonName"></h2>
+    <div id="pokeNameJapanese"></div>
     <img id="pokemonImage" src="">
   </div>
 </main>
@@ -27,6 +28,9 @@
 <script>
   // ポケモンの名前を表示する要素を取得
   let pokemonName = document.getElementById('pokemonName');
+
+  // ポケモンの名前を表示する要素を取得
+  let pokeNameJapanese = document.getElementById('pokeNameJapanese');
 
   // ポケモンの画像を表示する要素を取得
   let pokemonImage = document.getElementById('pokemonImage');
@@ -52,6 +56,30 @@
 
       // ポケモンの画像を表示
       pokemonImage.src = data.sprites.front_default;
+    })
+    .catch(function(error) {
+      // エラーが発生した場合はコンソールに出力
+      console.error(`エラーが発生しました:${error}`);
+    });
+    
+  //日本語名取得する
+  fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`)
+    .then(function (response) {
+      // レスポンスをコンソールに出力
+      console.log(response);
+
+      // JSONデータを取得して次の .then() に渡す
+      return response.json();
+    })
+    .then(function(data) {
+      // JSONデータをコンソールに出力
+      console.log(data);
+
+      const result = data.names.find((item) => item.language.name === "ja");
+
+      // ポケモンの名前を表示
+      pokeNameJapanese.textContent = result.name;
+
     })
     .catch(function(error) {
       // エラーが発生した場合はコンソールに出力
