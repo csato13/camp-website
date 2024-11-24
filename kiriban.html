@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>キリ番カウンター</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,11 +26,14 @@
 </head>
 <body>
   <h1>キリ番カウンター</h1>
-  <div class="counter">現在のカウント: <span id="count">0</span></div>
+  <div class="counter">現在のカウント: <span id="count"></span></div>
   <button id="increment">カウントを増やす</button>
   <div id="message" class="message"></div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
     // Firebaseの設定（Firebase Consoleからコピーしてください）
     const firebaseConfig = {
         apiKey: "AIzaSyBQM7j63WaYEMRvCglUAFVzifWXwvm-m9Q",
@@ -45,33 +46,43 @@
     };
 
     // Firebaseの初期化
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    console.log(database);
+    console.log(ref);
+//    const database = firebase.database();
 
     // データベース参照
-    const countRef = database.ref('counter');
+    const countRef = ref(database, 'counter');
     const countElement = document.getElementById('count');
     const messageElement = document.getElementById('message');
     const incrementButton = document.getElementById('increment');
+    let count = undefined;
 
     // カウントを取得して表示
-    countRef.on('value', (snapshot) => {
-      const count = snapshot.val() || 0; // 初期値を0に設定
+    onValue(countRef, (snapshot) => {
+      count = snapshot.val() || 0; // 初期値を0に設定
       countElement.textContent = count;
     });
+    // countRef.on('value', (snapshot) => {
+    //   const count = snapshot.val() || 0; // 初期値を0に設定
+    //   countElement.textContent = count;
+    // });
 
     // カウントを増やす
     incrementButton.addEventListener('click', () => {
-      countRef.transaction((currentCount) => {
-        return (currentCount || 0) + 1; // 現在のカウントを1増やす
-      }).then((result) => {
-        const newCount = result.snapshot.val();
-        if (newCount % 100 === 0 || /^(.)\1+$/.test(newCount.toString())) {
-          messageElement.textContent = `${newCount} はキリ番です！🎉`;
+        ++count;
+        set(ref(database, 'counter'), count);
+    //   countRef.transaction((currentCount) => {
+    //     return (currentCount || 0) + 1; // 現在のカウントを1増やす
+    //   }).then((result) => {
+        // const newCount = result.snapshot.val();
+        if (count % 100 === 0 || /^(.)\1+$/.test(count.toString())) {
+          messageElement.textContent = `${count} はキリ番です！🎉`;
         } else {
           messageElement.textContent = '';
         }
-      });
+    //   });
     });
   </script>
 </body>
